@@ -23,17 +23,17 @@ for _ in range(config['count']):
     # Get random endpoints for shape
     start = random.randint(0, img.size[0]), random.randint(0, img.size[1])
     end = random.randint(0, img.size[0]), random.randint(0, img.size[1])
-    
+
     # Draw shape
     shape = config['shape']
-    if shape == 'line':
-        draw.line((*start, *end), fill=rgb)    
-    elif shape == 'rectangle':
-        draw.rectangle((*start, *end), fill=rgb)
-    elif shape == 'arc':
+    if shape == 'arc':
         draw.arc((*start, *end), 0, random.randint(-180, 180), fill=rgb)
+    elif shape == 'line':
+        draw.line((*start, *end), fill=rgb)
     elif shape == 'pieslice':
         draw.pieslice((*start, *end), 0, random.randint(0, 180), fill=rgb)
 
+    elif shape == 'rectangle':
+        draw.rectangle((*start, *end), fill=rgb)
 # Store in file
-img.save("art.{}.{}.jpg".format(shape, random.randint(1000,9999)))
+img.save(f"art.{shape}.{random.randint(1000, 9999)}.jpg")

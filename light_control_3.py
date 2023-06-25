@@ -1,8 +1,5 @@
 def ask_user(prompt):
-    if 'y' == input(prompt + " [y/n]: "):
-        return True
-    else:
-        return False
+    return input(f"{prompt} [y/n]: ") == 'y'
 
 light_on = None
 is_dark = ask_user("Is it dark?")

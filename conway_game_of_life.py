@@ -29,9 +29,7 @@ def resize_console(rows, cols):
     :param cols: Int - The number of columns for the console to re-size to
     """
 
-    if cols < 32:
-        cols = 32
-
+    cols = max(cols, 32)
     if sys.platform.startswith('win'):
         command = "mode con: cols={0} lines={1}".format(cols + cols, rows + 5)
         os.system(command)
@@ -52,14 +50,11 @@ def create_initial_grid(rows, cols):
     """
 
     grid = []
-    for row in range(rows):
+    for _ in range(rows):
         grid_rows = []
-        for col in range(cols):
+        for _ in range(cols):
             # Generate a random number and based on that decide whether to add a live or dead cell to the grid
-            if random.randint(0, 7) == 0:
-                grid_rows += [1]
-            else:
-                grid_rows += [0]
+            grid_rows += [1] if random.randint(0, 7) == 0 else [0]
         grid += [grid_rows]
     return grid
 
@@ -76,17 +71,15 @@ def print_grid(rows, cols, grid, generation):
 
     clear_console()
 
-    # A single output string is used to help reduce the flickering caused by printing multiple lines
-    output_str = ""
-
-    # Compile the output string together and then print it to console
-    output_str += "Generation {0} - To exit the program early press <Ctrl-C>\n\r".format(generation)
+    output_str = (
+        ""
+        + "Generation {0} - To exit the program early press <Ctrl-C>\n\r".format(
+            generation
+        )
+    )
     for row in range(rows):
         for col in range(cols):
-            if grid[row][col] == 0:
-                output_str += ". "
-            else:
-                output_str += "@ "
+            output_str += ". " if grid[row][col] == 0 else "@ "
         output_str += "\n\r"
     print(output_str, end=" ")
 
@@ -136,7 +129,7 @@ def get_live_neighbors(row, col, rows, cols, grid):
     for i in range(-1, 2):
         for j in range(-1, 2):
             # Make sure to count the center cell located at grid[row][col]
-            if not (i == 0 and j == 0):
+            if i != 0 or j != 0:
                 # Using the modulo operator (%) the grid wraps around
                 life_sum += grid[((row + i) % rows)][((col + j) % cols)]
     return life_sum
@@ -157,7 +150,7 @@ def grid_changing(rows, cols, grid, next_grid):
     for row in range(rows):
         for col in range(cols):
             # If the cell at grid[row][col] is not equal to next_grid[row][col]
-            if not grid[row][col] == next_grid[row][col]:
+            if grid[row][col] != next_grid[row][col]:
                 return True
     return False
 

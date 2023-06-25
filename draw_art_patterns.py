@@ -69,19 +69,18 @@ def side8(w, oX, oY, c, e=0):
 
 def make_gif(prefix, pause_frames):
     images = []
-    for i, imgname in enumerate(glob.glob("{}.tmp.*.png".format(prefix))):
+    for i, imgname in enumerate(glob.glob(f"{prefix}.tmp.*.png")):
         img = imageio.imread(imgname)
         if i in pause_frames:
-            for c in range(7):
-                images.append(img)
+            images.extend(img for _ in range(7))
         else: 
             images.append(img)
-    imageio.mimsave("{}.gif".format(prefix), images)
+    imageio.mimsave(f"{prefix}.gif", images)
 
 
-def remove_files(prefix) :
+def remove_files(prefix):
     try:
-        [os.remove(img) for img in glob.glob("{}.tmp.*.png".format(prefix))]
+        [os.remove(img) for img in glob.glob(f"{prefix}.tmp.*.png")]
     except OSError: 
         pass
 
@@ -128,7 +127,7 @@ def octagon_flex(fig, c1, c2, c3, c4, c5):
                     add_shape(sub1, pts3, 45)
                     add_shape(sub1, pts2, 45, o)
 
-        savename = "octagon_flex.tmp.{}.png".format(string.ascii_lowercase[x])
+        savename = f"octagon_flex.tmp.{string.ascii_lowercase[x]}.png"
         fig.savefig(savename, bbox_inches='tight', pad_inches=0, dpi=50)
         plt.clf()
 

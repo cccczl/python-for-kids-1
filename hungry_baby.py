@@ -51,7 +51,7 @@ class Baby(threading.Thread):
                     self.num_items += 1
                 else:
                     # Baby cries and deducts 5 coins
-                    print("Baby: I want to eat only {}".format(self.to_eat))
+                    print(f"Baby: I want to eat only {self.to_eat}")
                     self.cry()
                     self.__piggy.add_coins(-5)
 
@@ -60,7 +60,7 @@ class Baby(threading.Thread):
                 self.cry()
                 self.__piggy.add_coins(-10)
 
-        print("\nBaby: I ate {} items. Thank you!!!".format(self.num_items))
+        print(f"\nBaby: I ate {self.num_items} items. Thank you!!!")
         
     def cry(self):
         pygame.mixer.music.play()

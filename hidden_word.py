@@ -19,9 +19,7 @@ class HiddenWordPuzzle:
     def make_grid(self, size):
         self.__grid = []
         for _ in range(size):
-            row = []
-            for _ in range(size):
-                row.append(random.choice(string.ascii_lowercase))
+            row = [random.choice(string.ascii_lowercase) for _ in range(size)]
             self.__grid.append(row)
         self.__numrows = self.__numcols = size
 
@@ -30,15 +28,15 @@ class HiddenWordPuzzle:
             print("{:2d} | ".format(rownum), end="")
             for cell in row:
                 if reveal_word and cell.isupper():
-                    print("\033[92m{}\033[0m ".format(cell), end='')
+                    print(f"\033[92m{cell}\033[0m ", end='')
                 else:
-                    print("{} ".format(cell.upper()), end='')
+                    print(f"{cell.upper()} ", end='')
             print("")
 
-        print("{}\n   | ".format('-'*(4+2*len(self.__grid[0]))), end='')
+        print(f"{'-' * (4 + 2 * len(self.__grid[0]))}\n   | ", end='')
 
         for colnum, _ in enumerate(self.__grid[0]):
-            print("{} ".format(string.ascii_lowercase[colnum]), end='')
+            print(f"{string.ascii_lowercase[colnum]} ", end='')
         print("")
 
     def insert_word(self, word):
@@ -78,18 +76,30 @@ class HiddenWordPuzzle:
 
         # Check dimensions
         if start_col >= self.__numcols or end_col >= self.__numcols or \
-           start_row >= self.__numrows or end_row >= self.__numrows:
+               start_row >= self.__numrows or end_row >= self.__numrows:
             print("Your input exceeds board dimensions. Try again.")
             return False
 
         # Check the length and direction
         word_len_h = end_col - start_col + 1
         word_len_v = end_row - start_row + 1
-        if word_len_h == len(self.__word) and word_len_v == 1 and self.__direction == 'right' or \
-           word_len_v == len(self.__word) and word_len_h == 1 and self.__direction == 'down' or \
-           word_len_v == len(self.__word) and word_len_h == len(self.__word) and self.__direction == 'diagonal':
-           pass
-        else:
+        if (
+            (
+                word_len_h != len(self.__word)
+                or word_len_v != 1
+                or self.__direction != 'right'
+            )
+            and (
+                word_len_v != len(self.__word)
+                or word_len_h != 1
+                or self.__direction != 'down'
+            )
+            and (
+                word_len_v != len(self.__word)
+                or word_len_h != len(self.__word)
+                or self.__direction != 'diagonal'
+            )
+        ):
             print("Either word length or direction is wrong. Try again.")
             return False
 
