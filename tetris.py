@@ -93,7 +93,7 @@ def check_collision(board, shape, offset):
 
 def remove_row(board, row):
 	del board[row]
-	return [[0 for i in range(config['cols'])]] + board
+	return [[0 for _ in range(config['cols'])]] + board
 	
 def join_matrixes(mat1, mat2, mat2_off):
 	off_x, off_y = mat2_off
@@ -103,9 +103,8 @@ def join_matrixes(mat1, mat2, mat2_off):
 	return mat1
 
 def new_board():
-	board = [ [ 0 for x in range(config['cols']) ]
-			for y in range(config['rows']) ]
-	board += [[ 1 for x in range(config['cols'])]]
+	board = [[0 for _ in range(config['cols'])] for _ in range(config['rows'])]
+	board += [[1 for _ in range(config['cols'])]]
 	return board
 
 class TetrisApp(object):
@@ -169,10 +168,8 @@ class TetrisApp(object):
 	def move(self, delta_x):
 		if not self.gameover and not self.paused:
 			new_x = self.stone_x + delta_x
-			if new_x < 0:
-				new_x = 0
-			if new_x > config['cols'] - len(self.stone[0]):
-				new_x = config['cols'] - len(self.stone[0])
+			new_x = max(new_x, 0)
+			new_x = min(new_x, config['cols'] - len(self.stone[0]))
 			if not check_collision(self.board,
 			                       self.stone,
 			                       (new_x, self.stone_y)):
@@ -183,24 +180,25 @@ class TetrisApp(object):
 		sys.exit()
 	
 	def drop(self):
-		if not self.gameover and not self.paused:
-			self.stone_y += 1
-			if check_collision(self.board,
-			                   self.stone,
-			                   (self.stone_x, self.stone_y)):
-				self.board = join_matrixes(
-				  self.board,
-				  self.stone,
-				  (self.stone_x, self.stone_y))
-				self.new_stone()
-				while True:
-					for i, row in enumerate(self.board[:-1]):
-						if 0 not in row:
-							self.board = remove_row(
-							  self.board, i)
-							break
-					else:
+		if self.gameover or self.paused:
+			return
+		self.stone_y += 1
+		if check_collision(self.board,
+		                   self.stone,
+		                   (self.stone_x, self.stone_y)):
+			self.board = join_matrixes(
+			  self.board,
+			  self.stone,
+			  (self.stone_x, self.stone_y))
+			self.new_stone()
+			while True:
+				for i, row in enumerate(self.board[:-1]):
+					if 0 not in row:
+						self.board = remove_row(
+						  self.board, i)
 						break
+				else:
+					break
 	
 	def rotate_stone(self):
 		if not self.gameover and not self.paused:
@@ -228,10 +226,10 @@ class TetrisApp(object):
 			'p':		self.toggle_pause,
 			'SPACE':	self.start_game
 		}
-		
-		self.gameover = False
+
 		self.paused = False
-		
+
+		self.gameover = False
 		pygame.time.set_timer(pygame.USEREVENT+1, config['delay'])
 		dont_burn_my_cpu = pygame.time.Clock()
 		while 1:
@@ -239,27 +237,25 @@ class TetrisApp(object):
 			if self.gameover:
 				self.center_msg("""Game Over!
 Press space to continue""")
+			elif self.paused:
+				self.center_msg("Paused")
 			else:
-				if self.paused:
-					self.center_msg("Paused")
-				else:
-					self.draw_matrix(self.board, (0,0))
-					self.draw_matrix(self.stone,
-					                 (self.stone_x,
-					                  self.stone_y))
+				self.draw_matrix(self.board, (0,0))
+				self.draw_matrix(self.stone,
+				                 (self.stone_x,
+				                  self.stone_y))
 			pygame.display.update()
-			
+
 			for event in pygame.event.get():
 				if event.type == pygame.USEREVENT+1:
 					self.drop()
 				elif event.type == pygame.QUIT:
 					self.quit()
 				elif event.type == pygame.KEYDOWN:
-					for key in key_actions:
-						if event.key == eval("pygame.K_"
-						+key):
-							key_actions[key]()
-					
+					for key, value in key_actions.items():
+						if event.key == eval(f"pygame.K_{key}"):
+							value()
+
 			dont_burn_my_cpu.tick(config['maxfps'])
 
 if __name__ == '__main__':
